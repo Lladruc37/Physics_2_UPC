@@ -3,6 +3,14 @@
 #include "Globals.h"
 #include "Box2D/Box2D/Box2D.h"
 
+class doubleVec2 {
+public:
+	int x1 = 0;
+	int y1 = 0;
+	int x2 = 0;
+	int y2 = 0;
+};
+
 class ModulePhysics : public Module
 {
 public:
@@ -13,6 +21,7 @@ public:
 	update_status PreUpdate();
 	update_status PostUpdate();
 	bool CleanUp();
+	doubleVec2 CreatePentagon(int topX, int topY, int sideLength);
 
 private:
 	bool debug;

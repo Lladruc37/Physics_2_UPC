@@ -22,6 +22,7 @@ enum update_status
 
 #define METERS_TO_PIXELS(a) (a * 100)
 #define PIXELS_TO_METERS(a) (a * 0.01)
+#define PI 3.14159265359
 
 // Configuration -----------
 #define SCREEN_WIDTH 1024

@@ -2,6 +2,8 @@
 #include "Application.h"
 #include "ModulePhysics.h"
 #include "math.h"
+#include <stdlib.h>
+#include <time.h>
 
 // TODO 1: Include Box 2 header and library
 #ifdef _DEBUG
@@ -33,17 +35,63 @@ bool ModulePhysics::Start()
 
 
 	// TODO 4: Create a a big static circle as "ground"
-	b2BodyDef groundBodyDef;
-	groundBodyDef.type = b2_staticBody;
-	groundBodyDef.position.Set(PIXELS_TO_METERS(SCREEN_WIDTH/2), PIXELS_TO_METERS(SCREEN_HEIGHT/2));
-	b2Body *groundBody = world->CreateBody(&groundBodyDef);
+	//GIANT CIRCLE
+	//b2BodyDef circleBodyDef;
+	//circleBodyDef.type = b2_staticBody;
+	//circleBodyDef.position.Set(PIXELS_TO_METERS(512), PIXELS_TO_METERS(380));
+	//b2Body *circleBody = world->CreateBody(&circleBodyDef);
 
-	b2CircleShape circle;
-	circle.m_radius = PIXELS_TO_METERS(300);
+	//b2CircleShape circle;
+	//circle.m_radius = PIXELS_TO_METERS(300);
 
-	b2FixtureDef fixture;
-	fixture.shape = &circle;
-	groundBody->CreateFixture(&fixture);
+	//b2FixtureDef fixtureCircle;
+	//fixtureCircle.shape = &circle;
+	//circleBody->CreateFixture(&fixtureCircle);
+
+	//FLOOR
+	b2BodyDef floorBodyDef;
+	floorBodyDef.type = b2_staticBody;
+	floorBodyDef.position.Set(PIXELS_TO_METERS(0), PIXELS_TO_METERS(0));
+	b2Body *floorBody = world->CreateBody(&floorBodyDef);
+
+	b2PolygonShape floor;
+	b2Vec2 verticesFloor[4];
+	verticesFloor[0].Set(PIXELS_TO_METERS(0), PIXELS_TO_METERS(730));
+	verticesFloor[1].Set(PIXELS_TO_METERS(0), PIXELS_TO_METERS(756));
+	verticesFloor[2].Set(PIXELS_TO_METERS(1022), PIXELS_TO_METERS(756));
+	verticesFloor[3].Set(PIXELS_TO_METERS(1022), PIXELS_TO_METERS(730));
+	int32 countFloor = 4;
+	floor.Set(verticesFloor, countFloor);
+	
+	b2FixtureDef fixtureFloor;
+	fixtureFloor.shape = &floor;
+	floorBody->CreateFixture(&fixtureFloor);
+
+	//POLYGON
+	b2BodyDef polyBodyDef;
+	polyBodyDef.type = b2_staticBody;
+	polyBodyDef.position.Set(PIXELS_TO_METERS(0), PIXELS_TO_METERS(0));
+	b2Body* polyBody = world->CreateBody(&polyBodyDef);
+
+	b2PolygonShape poly;
+	b2Vec2 verticesPoly[5];
+	//verticesPoly[0].Set(PIXELS_TO_METERS(412), PIXELS_TO_METERS(579));
+	//verticesPoly[1].Set(PIXELS_TO_METERS(412), PIXELS_TO_METERS(479));
+	//verticesPoly[2].Set(PIXELS_TO_METERS(612), PIXELS_TO_METERS(479));
+	//verticesPoly[3].Set(PIXELS_TO_METERS(612), PIXELS_TO_METERS(579));
+	doubleVec2 pentagon = CreatePentagon(512,379,100);
+	verticesPoly[0].Set(PIXELS_TO_METERS(512-pentagon.x1), PIXELS_TO_METERS(379-pentagon.y1));
+	verticesPoly[1].Set(PIXELS_TO_METERS(512-pentagon.x2), PIXELS_TO_METERS(379+pentagon.y2));
+	verticesPoly[2].Set(PIXELS_TO_METERS(512+pentagon.x2), PIXELS_TO_METERS(379+pentagon.y2));
+	verticesPoly[3].Set(PIXELS_TO_METERS(512+pentagon.x1), PIXELS_TO_METERS(379-pentagon.y1));
+	verticesPoly[4].Set(PIXELS_TO_METERS(512), PIXELS_TO_METERS(379 + 34.40954801));
+	int32 countPoly = 5;
+	poly.Set(verticesPoly, countPoly);
+
+	b2FixtureDef fixturePoly;
+	fixturePoly.shape = &poly;
+	polyBody->CreateFixture(&fixturePoly);
+
 	return true;
 }
 
@@ -66,8 +114,10 @@ update_status ModulePhysics::PostUpdate()
 		dynamicBodyDef.position.Set(PIXELS_TO_METERS(App->input->GetMouseX()), PIXELS_TO_METERS(App->input->GetMouseY()));
 		b2Body* dynamicBody = world->CreateBody(&dynamicBodyDef);
 
+		srand(time(NULL));
+		int r = rand() % 40 + 11;
 		b2CircleShape circle;
-		circle.m_radius = PIXELS_TO_METERS(20);
+		circle.m_radius = PIXELS_TO_METERS(r); //20
 
 		b2FixtureDef fixture;
 		fixture.shape = &circle;
@@ -96,7 +146,23 @@ update_status ModulePhysics::PostUpdate()
 					App->renderer->DrawCircle(METERS_TO_PIXELS(pos.x), METERS_TO_PIXELS(pos.y), METERS_TO_PIXELS(shape->m_radius), 255, 255, 255);
 				}
 				break;
-
+				case b2Shape::e_polygon:
+				{
+					b2PolygonShape* shape = (b2PolygonShape*)f->GetShape();
+					for (int k = 0; k < shape->m_count; k++) {
+						b2Vec2 ver1 = shape->m_vertices[k];
+						b2Vec2 ver2;
+						if ((k+1) == shape->m_count) {
+							LOG("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+							ver2 = shape->m_vertices[0];
+						}
+						else {
+							ver2 = shape->m_vertices[k + 1];
+						}
+						App->renderer->DrawLine(METERS_TO_PIXELS(ver1.x), METERS_TO_PIXELS(ver1.y), METERS_TO_PIXELS(ver2.x), METERS_TO_PIXELS(ver2.y), 255, 255, 255);
+					}
+				}
+				break;
 				// You will have to add more cases to draw boxes, edges, and polygons ...
 			}
 		}
@@ -115,4 +181,13 @@ bool ModulePhysics::CleanUp()
 	delete world;
 
 	return true;
+}
+
+doubleVec2 ModulePhysics::CreatePentagon( int topX, int topY, int sideLength) {
+	float radius = /*(1 / 10 *sqrt(25 + 10*sqrt(5))*sideLength)*/ 34.40954801;
+	int rightTopX = /*sin(2 * PI / 5)*/ 0.9510565163 * radius;
+	int rightTopY = /*cos(2 * PI / 5)*/ 0.3090169944 * radius;
+	int rightBotX = /*sin(4 * PI / 5)*/ 0.5877852523 * radius;
+	int rightBotY = /*cos(PI / 5)*/ 0.8090169944 * radius;
+	return { rightTopX, rightTopY, rightBotX, rightBotY };
 }
