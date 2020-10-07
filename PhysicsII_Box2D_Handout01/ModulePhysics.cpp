@@ -79,12 +79,13 @@ bool ModulePhysics::Start()
 	//verticesPoly[1].Set(PIXELS_TO_METERS(412), PIXELS_TO_METERS(479));
 	//verticesPoly[2].Set(PIXELS_TO_METERS(612), PIXELS_TO_METERS(479));
 	//verticesPoly[3].Set(PIXELS_TO_METERS(612), PIXELS_TO_METERS(579));
-	doubleVec2 pentagon = CreatePentagon(512,379,100);
-	verticesPoly[0].Set(PIXELS_TO_METERS(512-pentagon.x1), PIXELS_TO_METERS(379-pentagon.y1));
-	verticesPoly[1].Set(PIXELS_TO_METERS(512-pentagon.x2), PIXELS_TO_METERS(379+pentagon.y2));
-	verticesPoly[2].Set(PIXELS_TO_METERS(512+pentagon.x2), PIXELS_TO_METERS(379+pentagon.y2));
-	verticesPoly[3].Set(PIXELS_TO_METERS(512+pentagon.x1), PIXELS_TO_METERS(379-pentagon.y1));
-	verticesPoly[4].Set(PIXELS_TO_METERS(512), PIXELS_TO_METERS(379 + 34.40954801));
+	doubleVec2 pentagon = CreatePentagon(512,379,50);
+	verticesPoly[0].Set(PIXELS_TO_METERS(512), PIXELS_TO_METERS((379 - 42.53)));
+	verticesPoly[1].Set(PIXELS_TO_METERS((512-40.45)), PIXELS_TO_METERS((379-13.14)));
+	verticesPoly[2].Set(PIXELS_TO_METERS((512-22.87)), PIXELS_TO_METERS((379+35.86)));
+	verticesPoly[3].Set(PIXELS_TO_METERS((512+22.87)), PIXELS_TO_METERS((379+35.86)));
+	verticesPoly[4].Set(PIXELS_TO_METERS((512+40.45)), PIXELS_TO_METERS((379-13.14)));
+
 	int32 countPoly = 5;
 	poly.Set(verticesPoly, countPoly);
 
