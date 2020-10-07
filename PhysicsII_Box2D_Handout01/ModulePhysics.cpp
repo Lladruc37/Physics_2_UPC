@@ -75,11 +75,7 @@ bool ModulePhysics::Start()
 
 	b2PolygonShape poly;
 	b2Vec2 verticesPoly[5];
-	//verticesPoly[0].Set(PIXELS_TO_METERS(412), PIXELS_TO_METERS(579));
-	//verticesPoly[1].Set(PIXELS_TO_METERS(412), PIXELS_TO_METERS(479));
-	//verticesPoly[2].Set(PIXELS_TO_METERS(612), PIXELS_TO_METERS(479));
-	//verticesPoly[3].Set(PIXELS_TO_METERS(612), PIXELS_TO_METERS(579));
-	doubleVec2 pentagon = CreatePentagon(512,379,50);
+	//doubleVec2 pentagon = CreatePentagon(512,379,50);
 	verticesPoly[0].Set(PIXELS_TO_METERS(512), PIXELS_TO_METERS((379 - 42.53)));
 	verticesPoly[1].Set(PIXELS_TO_METERS((512-40.45)), PIXELS_TO_METERS((379-13.14)));
 	verticesPoly[2].Set(PIXELS_TO_METERS((512-22.87)), PIXELS_TO_METERS((379+35.86)));
@@ -184,11 +180,11 @@ bool ModulePhysics::CleanUp()
 	return true;
 }
 
-doubleVec2 ModulePhysics::CreatePentagon( int topX, int topY, int sideLength) {
-	float radius = /*(1 / 10 *sqrt(25 + 10*sqrt(5))*sideLength)*/ 34.40954801;
-	int rightTopX = /*sin(2 * PI / 5)*/ 0.9510565163 * radius;
-	int rightTopY = /*cos(2 * PI / 5)*/ 0.3090169944 * radius;
-	int rightBotX = /*sin(4 * PI / 5)*/ 0.5877852523 * radius;
-	int rightBotY = /*cos(PI / 5)*/ 0.8090169944 * radius;
-	return { rightTopX, rightTopY, rightBotX, rightBotY };
-}
+//doubleVec2 ModulePhysics::CreatePentagon( int topX, int topY, int sideLength) {
+//	float radius = /*(1 / 10 *sqrt(25 + 10*sqrt(5))*sideLength)*/ 34.40954801;
+//	int rightTopX = /*sin(2 * PI / 5)*/ 0.9510565163 * radius;
+//	int rightTopY = /*cos(2 * PI / 5)*/ 0.3090169944 * radius;
+//	int rightBotX = /*sin(4 * PI / 5)*/ 0.5877852523 * radius;
+//	int rightBotY = /*cos(PI / 5)*/ 0.8090169944 * radius;
+//	return { rightTopX, rightTopY, rightBotX, rightBotY };
+//}
