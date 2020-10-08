@@ -3,12 +3,13 @@
 #include "Globals.h"
 #include "Box2D/Box2D/Box2D.h"
 
-class doubleVec2 {
+class pentaFloat {
 public:
-	int x1 = 0;
-	int y1 = 0;
-	int x2 = 0;
-	int y2 = 0;
+	float r = 0;
+	float x1 = 0;
+	float y1 = 0;
+	float x2 = 0;
+	float y2 = 0;
 };
 
 class ModulePhysics : public Module
@@ -21,7 +22,12 @@ public:
 	update_status PreUpdate();
 	update_status PostUpdate();
 	bool CleanUp();
-	doubleVec2 CreatePentagon(int topX, int topY, int sideLength);
+	//The length of one of its sides
+	pentaFloat CalculatePentagon(int sideLength);
+	//The (x,y) coordinates of the center of the pentagon
+	//The length of one of its sides
+	//The type of body (static, kinematic, dynamic)
+	void CreatePentagon(int x, int y, int sideLength, b2BodyType bodyType);
 
 private:
 	bool debug;

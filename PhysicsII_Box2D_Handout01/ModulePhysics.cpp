@@ -35,6 +35,7 @@ bool ModulePhysics::Start()
 
 
 	// TODO 4: Create a a big static circle as "ground"
+
 	//GIANT CIRCLE
 	//b2BodyDef circleBodyDef;
 	//circleBodyDef.type = b2_staticBody;
@@ -68,26 +69,7 @@ bool ModulePhysics::Start()
 	floorBody->CreateFixture(&fixtureFloor);
 
 	//POLYGON
-	b2BodyDef polyBodyDef;
-	polyBodyDef.type = b2_staticBody;
-	polyBodyDef.position.Set(PIXELS_TO_METERS(0), PIXELS_TO_METERS(0));
-	b2Body* polyBody = world->CreateBody(&polyBodyDef);
-
-	b2PolygonShape poly;
-	b2Vec2 verticesPoly[5];
-	//doubleVec2 pentagon = CreatePentagon(512,379,50);
-	verticesPoly[0].Set(PIXELS_TO_METERS(512), PIXELS_TO_METERS((379 - 42.53)));
-	verticesPoly[1].Set(PIXELS_TO_METERS((512-40.45)), PIXELS_TO_METERS((379-13.14)));
-	verticesPoly[2].Set(PIXELS_TO_METERS((512-22.87)), PIXELS_TO_METERS((379+35.86)));
-	verticesPoly[3].Set(PIXELS_TO_METERS((512+22.87)), PIXELS_TO_METERS((379+35.86)));
-	verticesPoly[4].Set(PIXELS_TO_METERS((512+40.45)), PIXELS_TO_METERS((379-13.14)));
-
-	int32 countPoly = 5;
-	poly.Set(verticesPoly, countPoly);
-
-	b2FixtureDef fixturePoly;
-	fixturePoly.shape = &poly;
-	polyBody->CreateFixture(&fixturePoly);
+	CreatePentagon(300, 200, 150, b2_staticBody); //512,379,50,b2_staticBody
 
 	return true;
 }
@@ -121,6 +103,11 @@ update_status ModulePhysics::PostUpdate()
 		dynamicBody->CreateFixture(&fixture);
 	}
 
+	if (App->input->GetKey(SDL_SCANCODE_P) == KEY_DOWN) {
+		srand(time(NULL));
+		CreatePentagon(App->input->GetMouseX(), App->input->GetMouseY(), (rand() % 90 + 11), b2_dynamicBody);
+	}
+
 	if(App->input->GetKey(SDL_SCANCODE_F1) == KEY_DOWN)
 		debug = !debug;
 
@@ -146,6 +133,7 @@ update_status ModulePhysics::PostUpdate()
 				case b2Shape::e_polygon:
 				{
 					b2PolygonShape* shape = (b2PolygonShape*)f->GetShape();
+					b2Vec2 pos = f->GetBody()->GetPosition();
 					for (int k = 0; k < shape->m_count; k++) {
 						b2Vec2 ver1 = shape->m_vertices[k];
 						b2Vec2 ver2;
@@ -156,7 +144,7 @@ update_status ModulePhysics::PostUpdate()
 						else {
 							ver2 = shape->m_vertices[k + 1];
 						}
-						App->renderer->DrawLine(METERS_TO_PIXELS(ver1.x), METERS_TO_PIXELS(ver1.y), METERS_TO_PIXELS(ver2.x), METERS_TO_PIXELS(ver2.y), 255, 255, 255);
+						App->renderer->DrawLine(METERS_TO_PIXELS((pos.x + ver1.x)), METERS_TO_PIXELS((pos.y + ver1.y)), METERS_TO_PIXELS((pos.x + ver2.x)), METERS_TO_PIXELS((pos.y + ver2.y)), 255, 255, 255);
 					}
 				}
 				break;
@@ -180,11 +168,39 @@ bool ModulePhysics::CleanUp()
 	return true;
 }
 
-//doubleVec2 ModulePhysics::CreatePentagon( int topX, int topY, int sideLength) {
-//	float radius = /*(1 / 10 *sqrt(25 + 10*sqrt(5))*sideLength)*/ 34.40954801;
-//	int rightTopX = /*sin(2 * PI / 5)*/ 0.9510565163 * radius;
-//	int rightTopY = /*cos(2 * PI / 5)*/ 0.3090169944 * radius;
-//	int rightBotX = /*sin(4 * PI / 5)*/ 0.5877852523 * radius;
-//	int rightBotY = /*cos(PI / 5)*/ 0.8090169944 * radius;
-//	return { rightTopX, rightTopY, rightBotX, rightBotY };
-//}
+pentaFloat ModulePhysics::CalculatePentagon(int sideLength) {
+	float radius = sideLength / 2 * (1 / sin(b2_pi / 5));
+	float X1 = sideLength * sqrt(1 - 1 / ((1 / sin(b2_pi / 5)) * (1 / sin(b2_pi / 5))));
+	float Y1 = sqrt((radius * radius) - (X1 * X1));
+	float A = (4 * Y1 * Y1) + (4 * X1 * X1);
+	float n = ((Y1 * Y1) + (X1 * X1) + (radius * radius) - (sideLength * sideLength));
+	float B = -4 * n * Y1;
+	float C = (n * n) - (4 * X1 * X1 * radius * radius);
+	float discriminant = (B * B) - (4 * A * C);
+	float sqrtDisc = sqrt(discriminant);
+	float Y2 = (-B - sqrtDisc) / (2 * A);
+	float X2 = sqrt((radius * radius) - (Y2 * Y2));
+	return { radius, X1, Y1, X2, Y2 };
+}
+
+void ModulePhysics::CreatePentagon(int x, int y, int sideLength, b2BodyType bodyType) {
+	b2BodyDef polyBodyDef;
+	polyBodyDef.type = bodyType;
+	polyBodyDef.position.Set(PIXELS_TO_METERS((x/2)), PIXELS_TO_METERS((y/2)));
+	b2Body* polyBody = world->CreateBody(&polyBodyDef);
+
+	b2PolygonShape poly;
+	b2Vec2 verticesPoly[5];
+	pentaFloat pentagon = CalculatePentagon(sideLength);
+	verticesPoly[0].Set(PIXELS_TO_METERS((x/2)), PIXELS_TO_METERS((y/2 - pentagon.r)));
+	verticesPoly[1].Set(PIXELS_TO_METERS((x/2 - pentagon.x1)), PIXELS_TO_METERS((y/2 - pentagon.y1)));
+	verticesPoly[2].Set(PIXELS_TO_METERS((x/2 - pentagon.x2)), PIXELS_TO_METERS((y/2 - pentagon.y2)));
+	verticesPoly[3].Set(PIXELS_TO_METERS((x/2 + pentagon.x2)), PIXELS_TO_METERS((y/2 - pentagon.y2)));
+	verticesPoly[4].Set(PIXELS_TO_METERS((x/2 + pentagon.x1)), PIXELS_TO_METERS((y/2 - pentagon.y1)));
+	int32 countPoly = 5;
+	poly.Set(verticesPoly, countPoly);
+
+	b2FixtureDef fixturePoly;
+	fixturePoly.shape = &poly;
+	polyBody->CreateFixture(&fixturePoly);
+}
