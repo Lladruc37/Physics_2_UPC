@@ -15,8 +15,7 @@
 ModulePhysics::ModulePhysics(Application* app, bool start_enabled) : Module(app, start_enabled)
 {
 	debug = true;
-	b2Vec2 gravity(0.0f, 10.0f);
-	world = new b2World(gravity);
+	world = NULL;
 }
 
 // Destructor
@@ -32,7 +31,8 @@ bool ModulePhysics::Start()
 	// - You need to send it a default gravity
 	// - You need init the world in the constructor
 	// - Remember to destroy the world after using it
-
+	b2Vec2 gravity(0.0f, 10.0f);
+	world = new b2World(gravity);
 
 	// TODO 4: Create a a big static circle as "ground"
 
