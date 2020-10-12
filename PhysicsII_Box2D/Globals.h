@@ -20,12 +20,9 @@ enum update_status
 	UPDATE_ERROR
 };
 
-#define METERS_TO_PIXELS(a) (a * 100)
-#define PIXELS_TO_METERS(a) (a * 0.01)
-
 // Configuration -----------
 #define SCREEN_WIDTH 1024
-#define SCREEN_HEIGHT 758
+#define SCREEN_HEIGHT 768
 #define SCREEN_SIZE 1
 #define WIN_FULLSCREEN false
 #define WIN_RESIZABLE false
